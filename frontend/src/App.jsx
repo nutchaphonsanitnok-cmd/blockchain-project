@@ -1429,6 +1429,25 @@ export default function App() {
 
               <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 text-left text-xs space-y-1.5 text-slate-600">
                 <div className="flex items-center space-x-2 font-bold text-slate-800">
+                  <History className="w-4 h-4 text-slate-700" />
+                  <span>ประวัติธุรกรรมบนบล็อกเชน (Audit Trail)</span>
+                </div>
+                <div className="text-[11px] text-slate-500 flex flex-wrap items-center gap-1.5 pt-0.5">
+                  <span className="text-slate-400">Contract:</span>
+                  <a
+                    href={`https://sepolia.etherscan.io/address/${CONTRACT_ADDRESS}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-amber-600 hover:text-amber-700 hover:underline font-semibold"
+                  >
+                    {CONTRACT_ADDRESS} ↗
+                  </a>
+                  <span className="text-slate-400">(Sepolia Testnet)</span>
+                </div>
+              </div>
+
+              <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 text-left text-xs space-y-1.5 text-slate-600">
+                <div className="flex items-center space-x-2 font-bold text-slate-800">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span>ระบบตรวจจับบทบาทอัตโนมัติบนบล็อกเชน</span>
                 </div>
@@ -2376,6 +2395,8 @@ export default function App() {
             </div>
           </div>
         )}
+        </>
+        )}
 
         {/* ============================================================== */}
         {/* PUBLIC ON-CHAIN TRANSACTION HISTORY */}
@@ -2387,13 +2408,16 @@ export default function App() {
               <div>
                 <h3 className="font-bold text-slate-900 text-sm">ประวัติธุรกรรมบนบล็อกเชน (Audit Trail)</h3>
                 <p className="text-xs text-slate-400">
-                  Contract: {chainId === 11155111 ? (
-                    <a href={`https://sepolia.etherscan.io/address/${CONTRACT_ADDRESS}`} target="_blank" rel="noreferrer" className="font-mono text-amber-600 hover:underline font-semibold">
-                      {CONTRACT_ADDRESS} ↗
-                    </a>
-                  ) : (
-                    <span className="font-mono">{CONTRACT_ADDRESS}</span>
-                  )} ({isWeb3Connected ? (chainId === 11155111 ? 'Sepolia Testnet' : `Hardhat Local #${chainId}`) : 'Demo Mode'})
+                  Contract:{' '}
+                  <a
+                    href={`https://sepolia.etherscan.io/address/${CONTRACT_ADDRESS}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-amber-600 hover:underline font-semibold"
+                  >
+                    {CONTRACT_ADDRESS} ↗
+                  </a>{' '}
+                  <span>(Sepolia Testnet)</span>
                 </p>
               </div>
             </div>
@@ -2471,8 +2495,6 @@ export default function App() {
             ))}
           </div>
         </div>
-        </>
-        )}
 
         {/* Minimal Footer */}
         <footer className="mt-12 text-center text-xs text-slate-400 space-y-1">
