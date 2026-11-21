@@ -4,7 +4,7 @@ const { ethers } = require("hardhat");
 describe("CopperPoint (CUP) Smart Contract", function () {
   async function deployFixture() {
     const [admin, customer, staff, merchant, stranger] = await ethers.getSigners();
-    const CopperPoint = await ethers.getContractFactory("CopperPoint");
+    const CopperPoint = await ethers.getContractFactory("contracts/CopperPoint.sol:CopperPoint");
     const cup = await CopperPoint.deploy();
     await cup.waitForDeployment();
 

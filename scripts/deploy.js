@@ -9,7 +9,7 @@ async function main() {
   console.log("Deploying CopperPoint with admin:", deployer.address);
   console.log("Network:", hre.network.name, "Chain ID:", hre.network.config.chainId);
 
-  const CopperPoint = await hre.ethers.getContractFactory("CopperPoint");
+  const CopperPoint = await hre.ethers.getContractFactory("contracts/CopperPoint.sol:CopperPoint");
   const contract = await CopperPoint.deploy();
   await contract.waitForDeployment();
 

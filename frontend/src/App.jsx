@@ -100,9 +100,13 @@ function parseWeb3Error(err) {
   if (
     deepMsg.includes('AccessControlUnauthorizedAccount') ||
     deepMsg.includes('0xe2517d3f') ||
-    deepMsg.includes('unrecognized custom error')
+    lower.includes('unauthorized') ||
+    lower.includes('missing role')
   ) {
-    return 'กระเป๋านี้ยังไม่มีสิทธิ์ MINTER_ROLE (พนักงานชั่ง) ใน Smart Contract กรุณากดปุ่ม "รับสิทธิ์ Minter + Gas ETH" ด้านล่างเพื่อปลดล็อก';
+    return 'กระเป๋าปัจจุบันไม่มีสิทธิ์ในฟังก์ชันนี้ของ Smart Contract (เฉพาะกระเป๋า Admin 0xAa90...691c8 เท่านั้นที่มีสิทธิ์)';
+  }
+  if (lower.includes('execution reverted')) {
+    return 'ธุรกรรมถูกปฏิเสธ (Execution Reverted): กระเป๋าปัจจุบันไม่มีสิทธิ์ Admin หรือยอด Gas ETH ไม่เพียงพอ';
   }
   if (lower.includes('insufficient funds')) {
     return 'ยอด ETH ในกระเป๋าไม่พอจ่ายค่า Gas บน Localhost กรุณารับ Gas ETH ทดสอบก่อน';
@@ -1118,6 +1122,9 @@ export default function App() {
   // Action: Admin Toggle Pause
   const handleTogglePause = async () => {
     if (isWeb3Connected) {
+      if (!onChainRoles.admin) {
+        return notify('เฉพาะกระเป๋า Admin (0xAa90...691c8) เท่านั้นที่มีสิทธิ์สั่ง Pause / หยุดระบบฉุกเฉิน', 'warning', 5000);
+      }
       try {
         setIsProcessing(true);
         notify('กรุณายืนยันคำสั่ง Pause/Unpause ใน MetaMask...', 'info', 0);
@@ -1143,8 +1150,11 @@ export default function App() {
     if (!isWeb3Connected) {
       return notify('กรุณาเชื่อมต่อ MetaMask บัญชี Admin ก่อนจึงจะมอบสิทธิ์ On-Chain ได้', 'warning');
     }
+    if (!onChainRoles.admin) {
+      return notify('เฉพาะกระเป๋า Admin (0xAa90...691c8) เท่านั้นที่มีสิทธิ์มอบสิทธิ์ On-Chain', 'warning', 5000);
+    }
     if (!ethers.isAddress(grantTargetAddress)) {
-      return notify('Address ปลายทางไม่ถูกต้อง', 'error');
+      return notify('Address ปลายทางไม่ถูกต้อง กรุณาตรวจสอบให้แน่ใจว่าไม่มีตัวอักษรหรือเครื่องหมายผิดปกติ', 'error');
     }
     try {
       setIsProcessing(true);
@@ -1376,59 +1386,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* Minimal Role Switcher Bar */}
-      {isWeb3Connected && (
-        <nav className="bg-white/80 backdrop-blur-md border-b border-slate-100 py-2 px-4 sticky top-[61px] z-30">
-          <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div className="flex items-center space-x-1.5 text-slate-400 font-medium">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>โหมด On-Chain (สิทธิ์กระเป๋าจริง):</span>
-              <div className="flex items-center space-x-1 ml-1">
-                {onChainRoles.admin && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                    ADMIN
-                  </span>
-                )}
-                {onChainRoles.minter && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                    MINTER
-                  </span>
-                )}
-                {onChainRoles.merchant && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    MERCHANT
-                  </span>
-                )}
-                {!onChainRoles.admin && !onChainRoles.minter && !onChainRoles.merchant && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
-                    CUSTOMER
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-1 overflow-x-auto py-1">
-              {DEMO_ACCOUNTS.map((acc, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleSwitchAccount(acc)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center space-x-1.5 whitespace-nowrap ${
-                    activeTab === acc.role
-                      ? 'bg-slate-900 text-white shadow-sm'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200/60'
-                  }`}
-                >
-                  <span>
-                    {acc.role === 'customer' && '👨‍🔧 ผู้ขาย / แลกรางวัล'}
-                    {acc.role === 'minter' && '⚖️ พนักงานชั่ง'}
-                    {acc.role === 'admin' && '🛡️ แอดมิน (กำไร)'}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </nav>
-      )}
 
       {/* Main Content Area */}
       <main className="max-w-5xl mx-auto px-4 mt-6">
